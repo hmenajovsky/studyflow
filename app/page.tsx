@@ -117,7 +117,7 @@ export default async function Home({
                   )}
                 </p>
                 <Link
-                  href={`/studies/${study.id}`}
+                  href={`/studies/${studies[0].id}`}
                   className="rounded-full bg-foreground px-4 py-2 text-sm font-medium text-background transition-opacity hover:opacity-80"
                 >
                   Voir le détail
