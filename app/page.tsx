@@ -1,101 +1,146 @@
-import Image from "next/image";
+import Link from "next/link";
+import { prisma } from "@/lib/prisma";
+import StudyFilter, { type Period } from "@/components/study-filter";
 
-export default function Home() {
+const dateFormatter = new Intl.DateTimeFormat("fr-FR", {
+  day: "numeric",
+  month: "long",
+  year: "numeric",
+});
+
+function formatDate(date: Date) {
+  return dateFormatter.format(date);
+}
+
+function remainingPlaces(study: {
+  maxParticipants: number;
+  _count: { enrollments: number };
+}) {
+  return study.maxParticipants - study._count.enrollments;
+}
+
+function startOfToday(): Date {
+  const d = new Date();
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
+
+function addDays(d: Date, days: number): Date {
+  const r = new Date(d);
+  r.setDate(r.getDate() + days);
+  return r;
+}
+
+function addMonths(d: Date, months: number): Date {
+  const r = new Date(d);
+  r.setMonth(r.getMonth() + months);
+  return r;
+}
+
+function periodRange(period: Period): { gte: Date; lt: Date } | null {
+  const from = startOfToday();
+  if (period === "week") return { gte: from, lt: addDays(from, 7) };
+  if (period === "month") return { gte: from, lt: addMonths(from, 1) };
+  return null;
+}
+
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: { q?: string | string[]; period?: string | string[] };
+}) {
+  const q = typeof searchParams.q === "string" ? searchParams.q.trim() : "";
+  const period: Period =
+    searchParams.period === "week" || searchParams.period === "month"
+      ? searchParams.period
+      : "all";
+
+  const range = periodRange(period);
+  const studies = await prisma.study.findMany({
+    where: {
+      ...(q ? { title: { contains: q } } : {}),
+      ...(range ? { startDate: { gte: range.gte, lt: range.lt } } : {}),
+    },
+    orderBy: { startDate: "asc" },
+    include: {
+      _count: {
+        select: {
+          enrollments: { where: { status: "CONFIRMED" } },
+        },
+      },
+    },
+  });
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <main className="min-h-screen p-8 sm:p-16 font-[family-name:var(--font-geist-sans)]">
+      <header className="mb-10">
+        <h1 className="text-3xl font-bold">Études cliniques disponibles</h1>
+        <p className="mt-2 text-foreground/70">
+          Recherchez par titre et filtrez par période de début.
+        </p>
+      </header>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+      <section aria-label="Recherche et filtres" className="mb-8">
+        <StudyFilter q={q} period={period} />
+      </section>
+
+      <section aria-label="Liste des études" className="grid gap-6">
+        {studies.map((study) => {
+          const remaining = remainingPlaces(study);
+          return (
+            <div
+              key={study.id}
+              className="flex flex-col gap-4 rounded-xl border border-black/[0.08] dark:border-white/[0.145] p-6"
+            >
+              <div className="flex flex-wrap items-start justify-between gap-4">
+                <div>
+                  <h2 className="text-xl font-semibold">{study.title}</h2>
+                  <p className="mt-1 text-sm text-foreground/70">
+                    {formatDate(study.startDate)} · {study.location}
+                  </p>
+                </div>
+                <span className="rounded-full bg-foreground/5 px-3 py-1 text-sm font-medium">
+                  {study.category}
+                </span>
+              </div>
+
+              <div className="flex flex-wrap items-center justify-between gap-4">
+                <p className="text-sm">
+                  {remaining > 0 ? (
+                    <>
+                      <span className="font-semibold">{remaining}</span>{" "}
+                      place{remaining > 1 ? "s" : ""} restante
+                      {remaining > 1 ? "s" : ""}
+                    </>
+                  ) : (
+                    <span className="font-semibold text-red-600">Complet</span>
+                  )}
+                </p>
+                <Link
+                  href={`/studies/${study.id}`}
+                  className="rounded-full bg-foreground px-4 py-2 text-sm font-medium text-background transition-opacity hover:opacity-80"
+                >
+                  Voir le détail
+                </Link>
+              </div>
+            </div>
+          );
+        })}
+
+        {studies.length === 0 && (
+          <div className="rounded-xl border border-dashed border-black/[0.2] p-8 text-center dark:border-white/[0.3]">
+            <p className="text-foreground/70">
+              Aucune étude ne correspond à vos critères.
+            </p>
+            <Link
+              href="/"
+              className="mt-4 inline-block text-sm font-medium underline underline-offset-4"
+            >
+              Réinitialiser les filtres
+            </Link>
+          </div>
+        )}
+      </section>
+    </main>
   );
 }
