@@ -73,7 +73,7 @@ export async function enroll(
     });
 
     const status =
-      confirmedCount < study.maxParticipants ? "CONFIRMED" : "WAITLISTED";
+      confirmedCount <= study.maxParticipants ? "CONFIRMED" : "WAITLISTED";
 
     await tx.enrollment.create({
       data: { studyId, participantId: participant.id, status },
