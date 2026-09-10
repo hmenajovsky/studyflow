@@ -39,7 +39,7 @@ function addMonths(d: Date, months: number): Date {
 
 function periodRange(period: Period): { gte: Date; lt: Date } | null {
   const from = startOfToday();
-  if (period === "week") return { gte: from, lt: addDays(from, 7) };
+  if (period === "week") return { gte: from, lt: addDays(from, 14) };
   if (period === "month") return { gte: from, lt: addMonths(from, 1) };
   return null;
 }
