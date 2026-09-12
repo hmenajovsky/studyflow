@@ -13,15 +13,29 @@ enum EnrollmentStatus {
 }
 
 model Study {
-  id              String       @id @default(cuid())
+  id              String            @id @default(cuid())
   title           String
   description     String
   startDate       DateTime
   location        String
   category        String
   maxParticipants Int
-  createdAt       DateTime     @default(now())
+  createdAt       DateTime          @default(now())
+  instituteId     String
+  institute       ResearchInstitute @relation(fields: [instituteId], references: [id], onDelete: Cascade)
   enrollments     Enrollment[]
+
+  @@index([instituteId])
+}
+
+model ResearchInstitute {
+  id          String  @id @default(cuid())
+  name        String
+  description String
+  city        String
+  country     String
+  createdAt   DateTime @default(now())
+  studies     Study[]
 }
 
 model Participant {

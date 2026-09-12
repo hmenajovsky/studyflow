@@ -74,10 +74,20 @@ export default async function Home({
   return (
     <main className="min-h-screen p-8 sm:p-16 font-[family-name:var(--font-geist-sans)]">
       <header className="mb-10">
-        <h1 className="text-3xl font-bold">Études cliniques disponibles</h1>
-        <p className="mt-2 text-foreground/70">
-          Recherchez par titre et filtrez par période de début.
-        </p>
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold">Études cliniques disponibles</h1>
+            <p className="mt-2 text-foreground/70">
+              Recherchez par titre et filtrez par période de début.
+            </p>
+          </div>
+          <Link
+            href="/institutes"
+            className="rounded-full border border-black/[0.08] px-5 py-2 text-sm font-medium transition-colors hover:border-foreground/40 dark:border-white/[0.145]"
+          >
+            Instituts de recherche
+          </Link>
+        </div>
       </header>
 
       <section aria-label="Recherche et filtres" className="mb-8">

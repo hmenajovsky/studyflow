@@ -6,12 +6,55 @@ async function main() {
   await prisma.enrollment.deleteMany()
   await prisma.participant.deleteMany()
   await prisma.study.deleteMany()
+  await prisma.researchInstitute.deleteMany()
 
   const inDays = (days: number) => {
     const d = new Date();
     d.setDate(d.getDate() + days);
     return d;
   };
+
+  const institutesData = [
+    {
+      name: 'Institut de Recherche Clinique de Paris',
+      description:
+        'Centre de référence pour les essais cliniques en neurologie et vaccination.',
+      city: 'Paris',
+      country: 'France',
+    },
+    {
+      name: 'Institut Régional du Cœur',
+      description:
+        "Spécialisé dans les études cardiovasculaires et le suivi de l'hypertension.",
+      city: 'Lyon',
+      country: 'France',
+    },
+    {
+      name: 'Institut de Pharmacologie du Nord',
+      description:
+        'Site dédié aux études de pharmacocinétique et aux traitements adjuvants.',
+      city: 'Lille',
+      country: 'France',
+    },
+    {
+      name: 'Institut de Prévention Métabolique',
+      description:
+        "Lieu d'expérimentation sur les métabolismes et le suivi des pathologies chroniques.",
+      city: 'Toulouse',
+      country: 'France',
+    },
+    {
+      name: 'Institut de Recherche en Santé de Genève',
+      description:
+        'Centre spécialisé dans le développement de biomarqueurs et la médecine de précision.',
+      city: 'Genève',
+      country: 'Suisse',
+    },
+  ]
+
+  const institutes = await Promise.all(
+    institutesData.map((data) => prisma.researchInstitute.create({ data })),
+  )
 
   const studies = await Promise.all(
     [
@@ -23,6 +66,7 @@ async function main() {
         location: 'Paris',
         category: 'Neurologie',
         maxParticipants: 60,
+        instituteId: institutes[0].id,
       },
       {
         title: 'Impact de l\'activité physique sur la tension artérielle',
@@ -32,6 +76,7 @@ async function main() {
         location: 'Lyon',
         category: 'Cardiologie',
         maxParticipants: 2,
+        instituteId: institutes[1].id,
       },
       {
         title: 'Évaluation d\'un nouveau vaccin contre la grippe saisonnière',
@@ -41,6 +86,7 @@ async function main() {
         location: 'Bordeaux',
         category: 'Vaccination',
         maxParticipants: 300,
+        instituteId: institutes[0].id,
       },
       {
         title: 'Étude de biodisponibilité d\'une molécule antidiabétique',
@@ -50,6 +96,7 @@ async function main() {
         location: 'Lille',
         category: 'Métabolisme',
         maxParticipants: 24,
+        instituteId: institutes[2].id,
       },
       {
         title: 'Traitement adjuvant du mélanome de stade précoce',
@@ -59,6 +106,7 @@ async function main() {
         location: 'Marseille',
         category: 'Oncologie',
         maxParticipants: 120,
+        instituteId: institutes[2].id,
       },
       {
         title: 'Observance d\'un traitement antihypertenseur en ville',
@@ -68,6 +116,7 @@ async function main() {
         location: 'Nantes',
         category: 'Cardiologie',
         maxParticipants: 80,
+        instituteId: institutes[1].id,
       },
       {
         title: 'Télémédecine pour le suivi du diabète de type 2',
@@ -77,6 +126,7 @@ async function main() {
         location: 'Toulouse',
         category: 'Métabolisme',
         maxParticipants: 150,
+        instituteId: institutes[3].id,
       },
       {
         title: 'Atelier : suivi des indices corporels',
@@ -86,6 +136,17 @@ async function main() {
         location: 'Grenoble',
         category: 'Nutrition',
         maxParticipants: 10,
+        instituteId: institutes[3].id,
+      },
+      {
+        title: 'Évaluation d\'un biomarqueur salivaire pour le stress',
+        description:
+          'Étude pilote mesurant la pertinence d\'un biomarqueur salivaire comme indicateur du stress chronique.',
+        startDate: inDays(20),
+        location: 'Genève',
+        category: 'Cardiologie',
+        maxParticipants: 40,
+        instituteId: institutes[4].id,
       },
     ].map((data) => prisma.study.create({ data })),
   )
@@ -136,7 +197,7 @@ async function main() {
   }
 
   console.log(
-    `Seed terminé : ${studies.length} études, ${participants.length} participants, ${enrollments.length} inscriptions.`,
+    `Seed terminé : ${institutes.length} instituts, ${studies.length} études, ${participants.length} participants, ${enrollments.length} inscriptions.`,
   )
 }
 
