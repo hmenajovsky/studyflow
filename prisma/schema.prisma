@@ -1,0 +1,60 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum EnrollmentStatus {
+  CONFIRMED
+  WAITLISTED
+}
+
+model Study {
+  id              String       @id @default(cuid())
+  title           String
+  description     String
+  startDate       DateTime
+  location        String
+  category        String
+  maxParticipants Int
+  createdAt       DateTime     @default(now())
+  enrollments     Enrollment[]
+}
+
+model Participant {
+  id          String       @id @default(cuid())
+  name        String
+  email       String       @unique
+  createdAt   DateTime     @default(now())
+  enrollments Enrollment[]
+}
+
+model Enrollment {
+  id            String           @id @default(cuid())
+  studyId       String
+  participantId String
+  status        EnrollmentStatus @default(CONFIRMED)
+  createdAt     DateTime         @default(now())
+  study         Study            @relation(fields: [studyId], references: [id], onDelete: Cascade)
+  participant   Participant      @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  measurements  Measurement[]
+
+  @@unique([studyId, participantId])
+  @@index([studyId])
+  @@index([participantId])
+}
+
+model Measurement {
+  id           String     @id @default(cuid())
+  enrollmentId String
+  metric       String
+  value        Float
+  unit         String
+  measuredAt   DateTime   @default(now())
+  enrollment   Enrollment @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
+
+  @@index([enrollmentId])
+}
