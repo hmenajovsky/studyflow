@@ -1,36 +1,84 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# StudyFlow
 
-## Getting Started
+StudyFlow est une application pédagogique permettant de consulter des études cliniques et de gérer les inscriptions de participants.
 
-First, run the development server:
+Le projet sert de support aux ateliers de développement avec l'IA.
+
+## Stack
+
+* Next.js 14
+* TypeScript
+* Tailwind CSS
+* Prisma 6
+* SQLite
+* npm
+
+## Installation
+
+Après avoir cloné le dépôt :
+
+```bash
+npm install
+```
+## Configuration
+
+Créez un fichier `.env` à la racine du projet avec :
+
+```env
+DATABASE_URL="file:./dev.db"
+```
+
+## Base de données
+
+Le projet utilise SQLite avec Prisma.
+
+Pour initialiser la base de données et charger les données de test :
+
+```bash
+npm run db:migrate
+npm run db:seed
+```
+
+## Lancer l'application
+
+Démarrer le serveur de développement :
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Puis ouvrir :
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+http://localhost:3000
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Si le port 3000 est déjà utilisé, Next.js proposera automatiquement un autre port. Utilisez alors l'adresse indiquée dans le terminal.
 
-## Learn More
+## Vérifications
 
-To learn more about Next.js, take a look at the following resources:
+Pour vérifier le code :
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npm run lint
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Pour construire l'application :
 
-## Deploy on Vercel
+```bash
+npm run build
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+> Pendant les ateliers, ne lancez pas systématiquement `npm run lint` ou `npm run build` après chaque modification. Ces commandes servent principalement aux vérifications finales.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Structure
+
+Les principaux éléments du projet sont :
+
+* `app/` — pages et composants de l'application
+* `prisma/schema.prisma` — modèle de données
+* `prisma/migrations/` — migrations de la base de données
+* `prisma/seed.ts` — données de test
+* `public/` — fichiers statiques
+
+## Données de test
+
+La base de données contient des études, des participants et des inscriptions permettant de tester les principales fonctionnalités de l'application.
