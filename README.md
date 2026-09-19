@@ -20,6 +20,13 @@ Après avoir cloné le dépôt :
 ```bash
 npm install
 ```
+## Configuration
+
+Créez un fichier `.env` à la racine du projet avec :
+
+```env
+DATABASE_URL="file:./dev.db"
+```
 
 ## Base de données
 
